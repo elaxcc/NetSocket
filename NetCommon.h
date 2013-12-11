@@ -13,6 +13,8 @@ namespace Net
 
 enum error
 {
+	error_no_server_incoming_data_ = 2,
+	error_no_server_new_connection_ = 1,
 	error_no_ = 0,
 	error_create_socket_ = -1,
 	error_binding_ = -2,
@@ -30,7 +32,8 @@ enum error
 	error_connect_ = -14,
 	error_wrong_net_member_type_ = -15,
 	error_can_not_find_socket_ = -16,
-	error_can_not_find_server_ = -17
+	error_can_not_find_server_ = -17,
+	error_server_pollin_no_connect_co_data_ = -18
 };
 
 class i_net_member
