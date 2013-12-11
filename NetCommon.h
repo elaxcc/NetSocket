@@ -1,6 +1,12 @@
 #ifndef NETCOMMON_H_
 #define NETCOMMON_H_
 
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+
+#include "string"
+
 namespace Net
 {
 
@@ -24,6 +30,47 @@ enum error
 	error_wrong_net_member_type_ = -15,
 	error_can_not_find_socket_ = -16,
 	error_can_not_find_server_ = -17
+};
+
+class i_net_member
+{
+public:
+	virtual ~i_net_member() {};
+	virtual int process_ecent() = 0;
+};
+
+class simple_client
+{
+public:
+	simple_client(bool nonblocking, bool no_nagle_delay);
+	~simple_client();
+	int connect_to(const std::string& address, int port);
+	int close_connection();
+	int get_socket() const;
+
+private:
+	int socket_;
+	struct sockaddr_in address_;
+	bool nonblocking_;
+	bool no_nagle_delay_;
+};
+
+class simple_server
+{
+public:
+	simple_server(bool nonblocking, bool no_nagle_delay);
+	~simple_server();
+	int start_listen(int port);
+	int stop_listen();
+	int client_accept(int *client_socket,
+		struct sockaddr_in *client_addr) const;
+	int get_socket() const;
+
+private:
+	int socket_;
+	struct sockaddr_in address_;
+	bool nonblocking_;
+	bool no_nagle_delay_;
 };
 
 int send_data(int socket, char *data, int data_size);
