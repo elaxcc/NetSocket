@@ -55,9 +55,9 @@ void net_manager::remove_member(int socket)
 	}
 }
 
-int net_manager::process_sockets(short int poling_flags)
+int net_manager::process_sockets(short int polling_flags)
 {
-	int poll_result = poll_sockets(poling_flags, c_infinum_timeout);
+	int poll_result = poll_sockets(polling_flags, c_infinum_timeout);
 
 	if (poll_result == error_no_)
 	{
