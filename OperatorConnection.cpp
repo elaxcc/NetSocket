@@ -12,7 +12,8 @@ operator_server::operator_connection::~operator_connection()
 {
 }
 
-int operator_server::operator_connection::process_event()
+int operator_server::operator_connection::process_events(
+	short int polling_events)
 {
 	return 0;
 }

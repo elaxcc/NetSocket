@@ -70,7 +70,7 @@ int net_manager::process_sockets()
 			if ((member_polling_flags != 0)
 				&& (polling_list_[i].revents & member_polling_flags))
 			{
-				net_members_[i]->process_event();
+				net_members_[i]->process_events(polling_list_[i].revents);
 			}
 		}
 	}

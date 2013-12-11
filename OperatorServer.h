@@ -16,7 +16,7 @@ public:
 
 	// i_net_member
 	virtual ~operator_server();
-	virtual int process_event();
+	virtual int process_events(short int polling_events);
 	virtual int get_socket();
 	virtual short int get_polling_flags();
 

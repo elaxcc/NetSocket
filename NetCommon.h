@@ -37,7 +37,7 @@ class i_net_member
 {
 public:
 	virtual ~i_net_member() {};
-	virtual int process_event() = 0;
+	virtual int process_events(short int polling_events) = 0;
 	virtual int get_socket() = 0;
 	virtual short int get_polling_flags() = 0;
 };
