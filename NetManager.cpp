@@ -80,11 +80,10 @@ int net_manager::process_sockets()
 
 int net_manager::poll_sockets(short int poll_events, int timeout)
 {
-	std::vector<pollfd>::iterator iter = polling_list_.begin();
-	for (; iter != polling_list_.end(); ++iter)
+	for (unsigned int i = 0; i < polling_list_.size(); ++i)
 	{
-		iter->events = poll_events;
-		iter->revents = 0;
+		polling_list_[i].events = net_members_[i]->get_polling_flags();
+		polling_list_[i].revents = 0;
 	}
 
 	int result = poll(polling_list_.data(),
