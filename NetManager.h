@@ -4,8 +4,6 @@
 #include "NetCommon.h"
 
 #include <vector>
-#include <map>
-#include <memory>
 
 #include <poll.h>
 
@@ -18,16 +16,17 @@ public:
 	net_manager();
 	~net_manager();
 
-	//void add_member(const std::shared_ptr<i_net_member>& member);
+	int add_member(i_net_member *member);
 	void remove_member(int socket);
 
-	int poll_sockets(short int poll_events, int timeout);
+	int process_sockets();
 
 private:
+	int poll_sockets(short int poll_events, int timeout);
 	void remove_from_polling_list(int socket);
 
 private:
-	std::map<int, int > members_list_;
+	std::vector<i_net_member*> net_members_;
 	std::vector<pollfd> polling_list_;
 };
 

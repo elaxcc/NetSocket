@@ -3,17 +3,74 @@
 namespace Net
 {
 
+namespace
+{
+
+const int c_infinum_timeout = -1;
+
+}
+
 net_manager::net_manager()
 {
 }
 
 net_manager::~net_manager()
 {
+	for (int i = 0; i < net_members_.size(); ++i)
+	{
+		delete net_members_[i];
+	}
+
+	net_members_.clear();
+	polling_list_.clear();
+}
+
+int net_manager::add_member(i_net_member *member)
+{
+	if (member)
+	{
+		net_members_.push_back(member);
+
+		pollfd fd = {member->get_socket(), 0, 0};
+		polling_list_.push_back(fd);
+	}
+
+	return member->get_socket();
 }
 
 void net_manager::remove_member(int socket)
 {
+	std::vector<i_net_member*>::iterator member_iter =
+		net_members_.begin();
+	for(; member_iter != net_members_.end(); ++member_iter)
+	{
+		if ((*member_iter)->get_socket() == socket)
+		{
+			delete (*member_iter);
+			net_members_.erase(member_iter);
+			remove_from_polling_list(socket);
 
+			return;
+		}
+	}
+}
+
+int net_manager::process_sockets()
+{
+	int poll_result = poll_sockets(POLLIN, c_infinum_timeout);
+
+	if (poll_result == error_no_)
+	{
+		for (int i = 0; i < polling_list_.size(); ++i)
+		{
+			if (polling_list_[i].revents & POLLIN)
+			{
+				net_members_[i]->process_event();
+			}
+		}
+	}
+
+	return poll_result;
 }
 
 int net_manager::poll_sockets(short int poll_events, int timeout)

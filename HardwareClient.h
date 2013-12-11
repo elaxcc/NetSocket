@@ -16,9 +16,10 @@ public:
 	// i_net_member
 	virtual ~hardware_client();
 	virtual int process_event();
+	virtual int get_socket();
 
 private:
-	parser parse_;
+	parser parser_;
 };
 
 } // Net

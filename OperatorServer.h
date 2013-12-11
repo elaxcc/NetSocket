@@ -17,6 +17,11 @@ public:
 	// i_net_member
 	virtual ~operator_server();
 	virtual int process_event();
+	virtual int get_socket();
+
+private:
+	class operator_connection;
+
 private:
 	net_manager *net_manager_;
 };

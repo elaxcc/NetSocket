@@ -34,4 +34,9 @@ int operator_server::process_event()
 	return accept_result;
 }
 
+int operator_server::get_socket()
+{
+	return simple_server::get_socket();
+}
+
 } // Net

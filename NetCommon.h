@@ -36,7 +36,8 @@ class i_net_member
 {
 public:
 	virtual ~i_net_member() {};
-	virtual int process_ecent() = 0;
+	virtual int process_event() = 0;
+	virtual int get_socket() = 0;
 };
 
 class simple_client
