@@ -16,6 +16,7 @@ public:
 	virtual ~operator_connection();
 	virtual int process_event();
 	virtual int get_socket();
+	virtual short int get_polling_flags();
 
 private:
 	int socket_;

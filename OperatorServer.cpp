@@ -41,4 +41,9 @@ int operator_server::get_socket()
 	return simple_server::get_socket();
 }
 
+short int operator_server::get_polling_flags()
+{
+	return POLLIN;
+}
+
 } // Net

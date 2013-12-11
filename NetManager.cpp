@@ -7,6 +7,7 @@ namespace
 {
 
 const int c_infinum_timeout = -1;
+const short c_showed_polling_flags = POLLIN | POLLOUT | POLLPRI;
 
 }
 
@@ -16,7 +17,7 @@ net_manager::net_manager()
 
 net_manager::~net_manager()
 {
-	for (int i = 0; i < net_members_.size(); ++i)
+	for (unsigned int i = 0; i < net_members_.size(); ++i)
 	{
 		delete net_members_[i];
 	}
@@ -55,15 +56,19 @@ void net_manager::remove_member(int socket)
 	}
 }
 
-int net_manager::process_sockets(short int polling_flags)
+int net_manager::process_sockets()
 {
-	int poll_result = poll_sockets(polling_flags, c_infinum_timeout);
+	int poll_result = poll_sockets(c_showed_polling_flags,
+		c_infinum_timeout);
 
 	if (poll_result == error_no_)
 	{
 		for (unsigned int i = 0; i < polling_list_.size(); ++i)
 		{
-			if (polling_list_[i].revents & POLLIN)
+			short int member_polling_flags =
+				net_members_[i]->get_polling_flags();
+			if ((member_polling_flags != 0)
+				&& (polling_list_[i].revents & member_polling_flags))
 			{
 				net_members_[i]->process_event();
 			}

@@ -22,4 +22,9 @@ int operator_server::operator_connection::get_socket()
 	return socket_;
 }
 
+short int operator_server::operator_connection::get_polling_flags()
+{
+	return POLLOUT;
+}
+
 } // namespace Net

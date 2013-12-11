@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <poll.h>
 
 #include "string"
 
@@ -38,6 +39,7 @@ public:
 	virtual ~i_net_member() {};
 	virtual int process_event() = 0;
 	virtual int get_socket() = 0;
+	virtual short int get_polling_flags() = 0;
 };
 
 class simple_client

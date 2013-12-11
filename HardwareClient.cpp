@@ -37,7 +37,7 @@ int hardware_client::process_event()
 		std::cout << "TV_USEC: " << head.timestamp.tv_usec << std::endl;
 		std::cout << "VALUE: " << head.value << std::endl;
 		std::vector<char> data = parser_.get_data();
-		for (int i = 0; i < data.size(); ++i)
+		for (unsigned int i = 0; i < data.size(); ++i)
 		{
 			std::cout << data[i];
 		}
@@ -50,6 +50,11 @@ int hardware_client::process_event()
 int hardware_client::get_socket()
 {
 	return simple_client::get_socket();
+}
+
+short int hardware_client::get_polling_flags()
+{
+	return POLLIN;
 }
 
 } // Net

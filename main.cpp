@@ -22,7 +22,7 @@ int main(int argc, char** argv)
 
 	while (true)
 	{
-		net_manager.process_sockets(POLLIN);
+		net_manager.process_sockets();
 	}
 
 	return 0;

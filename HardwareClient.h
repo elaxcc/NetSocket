@@ -17,6 +17,7 @@ public:
 	virtual ~hardware_client();
 	virtual int process_event();
 	virtual int get_socket();
+	virtual short int get_polling_flags();
 
 private:
 	parser parser_;
