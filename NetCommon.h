@@ -13,8 +13,6 @@ namespace Net
 
 enum error
 {
-	error_no_server_incoming_data_ = 2,
-	error_no_server_new_connection_ = 1,
 	error_no_ = 0,
 	error_create_socket_ = -1,
 	error_binding_ = -2,

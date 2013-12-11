@@ -21,27 +21,22 @@ operator_server::~operator_server()
 
 int operator_server::process_events(short int polling_events)
 {
+	int accept_result = error_no_;
 	if (polling_events & POLLIN)
 	{
-		// for POLLIN event it may be new connection or
-		// incoming data
-
-		// process new connection
-
 		int new_client_socket;
 		struct sockaddr_in new_client_addr;
-		int accept_result = client_accept(
+
+		accept_result = client_accept(
 			&new_client_socket, &new_client_addr);
+
 		if (accept_result == error_no_)
 		{
 			net_manager_->add_member(
 				new operator_connection(new_client_socket));
-			return error_no_server_new_connection_;
 		}
-
-		// process incoming data
 	}
-	return error_server_pollin_no_connect_co_data_;
+	return accept_result;
 }
 
 int operator_server::get_socket()

@@ -10,8 +10,6 @@ hardware_client::hardware_client(const std::string& address, int port,
 	: simple_client(nonblocking, no_nagle_delay)
 {
 	connect_to(address, port);
-
-	Net::send_data(simple_client::get_socket(), (char *) "out data", 8);
 }
 
 hardware_client::~hardware_client()
@@ -47,6 +45,16 @@ int hardware_client::process_events(short int polling_events)
 		}
 	}
 
+	if (polling_events & POLLOUT)
+	{
+		int send_result = send_data(
+			simple_client::get_socket(), (char *) "out data", 8);
+		if (send_result != error_no_)
+		{
+			std::cout << "Error send" << std::endl;
+		}
+	}
+
 	return error_no_;
 }
 
@@ -57,7 +65,7 @@ int hardware_client::get_socket()
 
 short int hardware_client::get_polling_flags()
 {
-	return POLLIN;
+	return POLLIN | POLLOUT;
 }
 
 } // Net
