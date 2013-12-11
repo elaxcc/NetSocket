@@ -61,7 +61,7 @@ int net_manager::process_sockets(short int poling_flags)
 
 	if (poll_result == error_no_)
 	{
-		for (int i = 0; i < polling_list_.size(); ++i)
+		for (unsigned int i = 0; i < polling_list_.size(); ++i)
 		{
 			if (polling_list_[i].revents & POLLIN)
 			{

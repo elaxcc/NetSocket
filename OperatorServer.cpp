@@ -1,6 +1,7 @@
 #include "OperatorServer.h"
 
 #include "NetManager.h"
+#include "OperatorConnection.h"
 
 namespace Net
 {
@@ -28,7 +29,8 @@ int operator_server::process_event()
 
 	if (accept_result == error_no_)
 	{
-		//net_manager_->
+		net_manager_->add_member(
+			new operator_connection(new_client_socket));
 	}
 
 	return accept_result;
