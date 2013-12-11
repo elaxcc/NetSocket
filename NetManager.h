@@ -19,7 +19,7 @@ public:
 	int add_member(i_net_member *member);
 	void remove_member(int socket);
 
-	int process_sockets();
+	int process_sockets(short int poling_flags);
 
 private:
 	int poll_sockets(short int poll_events, int timeout);
