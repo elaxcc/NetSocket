@@ -214,7 +214,7 @@ int send_data(int socket, char *data, int data_size)
 			sended_bytes = send(
 					socket,
 					&(data[data_size - total_bytes]),
-					total_bytes, 0);
+					total_bytes, MSG_NOSIGNAL);
 
 			if (sended_bytes < 0)
 			{
