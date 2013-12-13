@@ -42,16 +42,13 @@ int hardware_client::process_events(short int polling_events)
 				std::cout << data[i];
 			}
 			std::cout << std::endl;
-		}
-	}
 
-	if (polling_events & POLLOUT)
-	{
-		int send_result = send_data(
-			simple_client::get_socket(), (char *) "out data", 8);
-		if (send_result != error_no_)
-		{
-			std::cout << "Error send" << std::endl;
+			int send_result = send_data(
+				simple_client::get_socket(), (char *) "out data", 8);
+			if (send_result != error_no_)
+			{
+				std::cout << "Error send" << std::endl;
+			}
 		}
 	}
 
@@ -65,7 +62,7 @@ int hardware_client::get_socket()
 
 short int hardware_client::get_polling_flags()
 {
-	return POLLIN | POLLOUT;
+	return POLLIN;
 }
 
 } // Net

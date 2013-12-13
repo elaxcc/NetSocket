@@ -61,16 +61,35 @@ int net_manager::process_sockets()
 	int poll_result = poll_sockets(c_showed_polling_flags,
 		c_infinum_timeout);
 
+	std::vector<int> members_for_delete; // store for disconnected net members
+
 	if (poll_result == error_no_)
 	{
-		for (unsigned int i = 0; i < polling_list_.size(); ++i)
+		// process net members and remember who is disconnected
+		unsigned members_cnt = polling_list_.size();
+		for (unsigned int i = 0; i < members_cnt; ++i)
 		{
 			short int member_polling_flags =
 				net_members_[i]->get_polling_flags();
 			if ((member_polling_flags != 0)
 				&& (polling_list_[i].revents & member_polling_flags))
 			{
-				net_members_[i]->process_events(polling_list_[i].revents);
+				int process_result =
+					net_members_[i]->process_events(polling_list_[i].revents);
+				if (process_result == error_connection_is_closed_)
+				{
+					members_for_delete.push_back(
+						net_members_[i]->get_socket());
+				}
+			}
+		}
+
+		// remove disconnected net members from net members list
+		if (!members_for_delete.empty())
+		{
+			for (unsigned int i = 0; i < members_for_delete.size(); ++i)
+			{
+				remove_member(members_for_delete[i]);
 			}
 		}
 	}
