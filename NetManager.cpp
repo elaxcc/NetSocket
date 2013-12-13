@@ -7,7 +7,6 @@ namespace
 {
 
 const int c_infinum_timeout = -1;
-const short c_showed_polling_flags = POLLIN | POLLOUT | POLLPRI;
 
 }
 
@@ -58,8 +57,7 @@ void net_manager::remove_member(int socket)
 
 int net_manager::process_sockets()
 {
-	int poll_result = poll_sockets(c_showed_polling_flags,
-		c_infinum_timeout);
+	int poll_result = poll_sockets(c_infinum_timeout);
 
 	std::vector<int> members_for_delete; // store for disconnected net members
 
@@ -97,7 +95,7 @@ int net_manager::process_sockets()
 	return poll_result;
 }
 
-int net_manager::poll_sockets(short int poll_events, int timeout)
+int net_manager::poll_sockets(int timeout)
 {
 	for (unsigned int i = 0; i < polling_list_.size(); ++i)
 	{

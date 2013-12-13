@@ -22,7 +22,7 @@ public:
 	int process_sockets();
 
 private:
-	int poll_sockets(short int poll_events, int timeout);
+	int poll_sockets(int timeout);
 	void remove_from_polling_list(int socket);
 
 private:
