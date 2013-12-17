@@ -82,6 +82,9 @@ int net_manager::process_sockets()
 			}
 		}
 
+		// process local messages
+		local_communicator_.process();
+
 		// remove disconnected net members from net members list
 		if (!members_for_delete.empty())
 		{
