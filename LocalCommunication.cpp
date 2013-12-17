@@ -28,7 +28,7 @@ int local_communicator_manager::add_message(
 	int source_id, int destination_id,
 	const std::vector<char> message)
 {
-	for (int i = 0; i < members_.size(); ++i)
+	for (unsigned int i = 0; i < members_.size(); ++i)
 	{
 		if (members_[i]->get_id() == destination_id)
 		{
@@ -45,9 +45,9 @@ int local_communicator_manager::add_message(
 
 void local_communicator_manager::process()
 {
-	for (int i = 0; i < messages_.size(); ++i)
+	for (unsigned int i = 0; i < messages_.size(); ++i)
 	{
-		for (int j = 0; j < members_.size(); ++j)
+		for (unsigned int j = 0; j < members_.size(); ++j)
 		{
 			if (messages_[i].destination_ == members_[j]->get_id())
 			{

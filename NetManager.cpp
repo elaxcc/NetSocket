@@ -130,4 +130,9 @@ void net_manager::remove_from_polling_list(int socket)
 	}
 }
 
+local_communicator_manager* net_manager::get_local_communicator()
+{
+	return &local_communicator_;
+}
+
 } // nemaspace Net
