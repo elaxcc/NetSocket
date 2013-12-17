@@ -242,24 +242,4 @@ int recv_data(int socket, char *buf, int buf_size, int *recv_data_size)
 	return error_no_;
 }
 
-int wait_socket(int socket, short int poll_event, int poll_timeout)
-{
-	struct pollfd fd;
-	memset(&fd, 0, sizeof(fd));
-	fd.fd = socket;
-	fd.events = poll_event;
-
-	int result = poll(&fd, 1, poll_timeout);
-
-	if (result == 0)
-	{
-		return error_poll_timeout_;
-	}
-	else if (result < 0)
-	{
-		return error_poll_;
-	}
-	return error_no_;
-}
-
 } // Net

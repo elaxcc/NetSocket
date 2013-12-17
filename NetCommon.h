@@ -11,6 +11,9 @@
 namespace Net
 {
 
+/*!
+ * List of net errors
+ */
 enum error
 {
 	error_no_ = 0,
@@ -34,22 +37,71 @@ enum error
 	error_server_pollin_no_connect_co_data_ = -18
 };
 
+/*!
+ * common net member interface
+ */
 class i_net_member
 {
 public:
 	virtual ~i_net_member() {};
+
+	/*!
+	 * Process polling events that installed in 'polling_events'
+	 * [in] polling_events - polling flags that has been occurred
+	 * retval - error code
+	 */
 	virtual int process_events(short int polling_events) = 0;
+
+	/*!
+	 * Return socket of the current net member
+	 * retval - net member socket
+	 */
 	virtual int get_socket() = 0;
+
+	/*!
+	 * Return polling flags that used by this net member in that time
+	 * retval - polling flags
+	 */
 	virtual short int get_polling_flags() = 0;
 };
 
+/*!
+ * Class for client realization
+ */
 class simple_client
 {
 public:
+	/*!
+	 * Constructor
+	 * [in] nonblocking - flag showed to create nonblocked socket
+	 * [in] no_nagle_delay -flag shoed to create socket without
+	 * Nagle's algorithm
+	 */
 	simple_client(bool nonblocking, bool no_nagle_delay);
+
+	/*!
+	 * Destructor
+	 */
 	~simple_client();
+
+	/*!
+	 * Connect to server
+	 * [in] address - address of the server for connection
+	 * [in] port - server port for connection
+	 * retval - error code
+	 */
 	int connect_to(const std::string& address, int port);
+
+	/*!
+	 * Close connection
+	 * retval - error code
+	 */
 	int close_connection();
+
+	/*!
+	 * Return own client socket
+	 * retval - own socket
+	 */
 	int get_socket() const;
 
 private:
@@ -59,15 +111,51 @@ private:
 	bool no_nagle_delay_;
 };
 
+/*!
+ * Class for server realization
+ */
 class simple_server
 {
 public:
+	/*!
+	 * Constructor
+	 * [in] nonblocking - flag showed to create nonblocked socket
+	 * [in] no_nagle_delay -flag shoed to create socket without
+	 * Nagle's algorithm
+	 */
 	simple_server(bool nonblocking, bool no_nagle_delay);
+
+	/*!
+	 * Destructor
+	 */
 	~simple_server();
+
+	/*!
+	 * Start listen clients
+	 * [in] port - port for listening
+	 * retval - error code
+	 */
 	int start_listen(int port);
+
+	/*!
+	 * Stop listen clients
+	 * retval - error code
+	 */
 	int stop_listen();
+
+	/*!
+	 * Accept new client
+	 * [out] client_socket - new client socket
+	 * [out] client_addr - new client address
+	 * retval - error code
+	 */
 	int client_accept(int *client_socket,
 		struct sockaddr_in *client_addr) const;
+
+	/*!
+	 * Return socket
+	 * retval - own socket
+	 */
 	int get_socket() const;
 
 private:
@@ -77,9 +165,23 @@ private:
 	bool no_nagle_delay_;
 };
 
+/*!
+ * Send data to socket
+ * [in] socket - socket for sending
+ * [in] data - data for sending
+ * [in] data_size - data size for sending
+ * retval - error code
+ */
 int send_data(int socket, char *data, int data_size);
+
+/*!
+ * Receive data from socket
+ * [in] socket - socket for receiving
+ * [out] buf - buffer for storing data
+ * [in] buf_size - buffer size for receiving
+ * retval - error code
+ */
 int recv_data(int socket, char *buf, int buf_size, int *recv_data_size);
-int wait_socket(int socket, short int poll_event, int poll_timeout);
 
 }
 

@@ -104,7 +104,7 @@ int net_manager::poll_sockets(int timeout)
 	}
 
 	int result = poll(polling_list_.data(),
-		polling_list_.size(), -1);
+		polling_list_.size(), timeout);
 
 	if (result == 0)
 	{
