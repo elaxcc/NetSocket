@@ -34,7 +34,7 @@ int main(int argc, char** argv)
 		const std::vector<char>& data)
 		{
 			std::cout << "I am A, my data: ";
-			for (int i = 0; i < data.size(); ++i)
+			for (unsigned int i = 0; i < data.size(); ++i)
 			{
 				std::cout << data[i];
 			}
@@ -56,7 +56,7 @@ int main(int argc, char** argv)
 		const std::vector<char>& data)
 		{
 			std::cout << "I am B, my data: ";
-			for (int i = 0; i < data.size(); ++i)
+			for (unsigned int i = 0; i < data.size(); ++i)
 			{
 				std::cout << data[i];
 			}
@@ -80,7 +80,7 @@ int main(int argc, char** argv)
 	char b_data[] = "Hello A";
 	std::vector<char> b_vec(
 		b_data, b_data + sizeof(b_data) / sizeof(char));
-	b.send_message("AB", a_vec);
+	b.send_message("AB", b_vec);
 
 	while (true)
 	{

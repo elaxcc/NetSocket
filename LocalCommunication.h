@@ -46,7 +46,7 @@ public:
 	 * [in] message - message for transmission
 	 * retval - transmission result
 	 */
-	bool send_message(const std::string& link,
+	void send_message(const std::string& link,
 		const std::vector<char>& message);
 
 private:
@@ -56,32 +56,11 @@ private:
 	 */
 	void set_id(int id);
 
-	/*!
-	 * Add link to links list
-	 * [in] link - link name
-	 * [in] destination_id - destination ID for linking
-	 */
-	void add_link(const std::string& link, int destination_id);
-
-	/*!
-	 * Remove link from list
-	 * [in] link - link name for removing
-	 */
-	void remove_link(const std::string& link);
-
-	/*!
-	 * Find link in list by destination ID
-	 * [in] id - member ID for searching
-	 * retval - link
-	 */
-	std::string find_link_by_id(int id) const;
-
 private:
 	friend class local_communicator_manager;
 
 private:
 	int id_;
-	std::map<std::string, int> links_list_;
 	local_communicator_manager* manager_;
 };
 
@@ -103,7 +82,7 @@ public:
 	 * [in] member_first - first member for linking
 	 * [in] member_second - second member for linking
 	 */
-	bool create_link(const std::string& link_name,
+	bool create_link(const std::string& link,
 		i_local_communicator* member_first,
 		i_local_communicator* member_second);
 
@@ -126,7 +105,7 @@ private:
 	 * [in] message - message for transmission
 	 * retval error code
 	 */
-	bool add_message(int source_id, int destination_id,
+	void add_message(const std::string& link, int source_id,
 		const std::vector<char>& message);
 
 private:
@@ -138,14 +117,14 @@ private:
 	 */
 	struct message_info
 	{
-		int source_;
-		int destination_;
+		std::string link_;
+		int source_id_;
 		std::vector<char> message_;
 
-		message_info(int source, int destination,
+		message_info(const std::string link, int source_id,
 			const std::vector<char> message)
-			: source_(source)
-			, destination_(destination)
+			: link_(link)
+			, source_id_(source_id)
 			, message_(message)
 		{
 		}
@@ -156,9 +135,22 @@ private:
 		}
 	};
 
+	struct real_link
+	{
+		int first_;
+		int second_;
+
+		real_link(int first, int second)
+			: first_(first)
+			, second_(second)
+		{
+		}
+	};
+
 private:
 	std::vector<message_info> messages_;
 	std::map<int, i_local_communicator*> members_;
+	std::map<std::string, real_link> links_list_;
 	int last_added_member_id_;
 };
 
