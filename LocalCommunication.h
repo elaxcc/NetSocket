@@ -7,9 +7,26 @@
 namespace Net
 {
 
+/*!
+ * You must store local communicators ID here
+ */
+/*enum LocalConnector
+{
+
+};*/
+
 class i_local_communicator
 {
 public:
+	/*!
+	 * Constructor
+	 * [in] unique_id - unique id of communicator
+	 */
+	i_local_communicator(int unique_id)
+		: id_(unique_id)
+	{
+	}
+
 	/*!
 	 * Destructor
 	 */
@@ -21,16 +38,8 @@ public:
 	 * [in] data - message data
 	 * retval error code
 	 */
-	virtual int process(int source_id, const std::vector<char>& data) = 0;
-
-	/*!
-	 * Set member ID
-	 * [in] id - ID for setting
-	 */
-	void set_id(int id)
-	{
-		id_ = id;
-	}
+	virtual int process_message(int source_id,
+		const std::vector<char>& data) = 0;
 
 	/*!
 	 * Get member ID
@@ -62,7 +71,7 @@ public:
 	 * [in] member - communicator pointer for adding
 	 * retval - new added communicator ID
 	 */
-	int add_communicator(i_local_communicator *member);
+	void add_communicator(i_local_communicator *member);
 
 	/*!
 	 * Add message for sending
@@ -71,7 +80,7 @@ public:
 	 * [in] message - message for transmission
 	 * retval error code
 	 */
-	int add_message(int source_id, int destination_id,
+	bool add_message(int source_id, int destination_id,
 		const std::vector<char> message);
 
 	/*!
@@ -105,7 +114,6 @@ private:
 	};
 
 private:
-	int current_added_member_id_;
 	std::vector<message_info> messages_;
 	std::map<int, i_local_communicator*> members_;
 };

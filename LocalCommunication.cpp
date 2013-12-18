@@ -4,7 +4,6 @@ namespace Net
 {
 
 local_communicator_manager::local_communicator_manager()
-	: current_added_member_id_(0)
 {
 }
 
@@ -14,23 +13,22 @@ local_communicator_manager::~local_communicator_manager()
 	members_.clear();
 }
 
-int local_communicator_manager::add_communicator(
+void local_communicator_manager::add_communicator(
 	i_local_communicator *member)
 {
 	if (member)
 	{
-		current_added_member_id_++;
-		member->set_id(current_added_member_id_);
-		members_.insert(std::pair(current_added_member_id_,
-			member));
-
-		return current_added_member_id_;
+		std::map<int, i_local_communicator*>::iterator iter =
+			members_.find(member->get_id());
+		if (iter == members_.end())
+		{
+			members_.insert(std::pair<int, i_local_communicator*>(
+				member->get_id(), member));
+		}
 	}
-
-	return 0;
 }
 
-int local_communicator_manager::add_message(
+bool local_communicator_manager::add_message(
 	int source_id, int destination_id,
 	const std::vector<char> message)
 {
@@ -39,17 +37,14 @@ int local_communicator_manager::add_message(
 
 	if (iter != members_.end())
 	{
-		if (iter->second->get_id() == destination_id)
-		{
-			messages_.push_back(
-				message_info(
-					source_id,
-					destination_id,
-					message));
-			return 0;
-		}
+		messages_.push_back(
+			message_info(
+				source_id,
+				destination_id,
+				message));
+		return true;
 	}
-	return -1;
+	return false;
 }
 
 void local_communicator_manager::process()
@@ -61,7 +56,7 @@ void local_communicator_manager::process()
 
 		if (iter != members_.end())
 		{
-			iter->second->process(messages_[i].source_,
+			iter->second->process_message(messages_[i].source_,
 				messages_[i].message_);
 		}
 	}
