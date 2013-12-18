@@ -82,9 +82,6 @@ int net_manager::process_sockets()
 			}
 		}
 
-		// process local messages
-		local_communicator_.process();
-
 		// remove disconnected net members from net members list
 		if (!members_for_delete.empty())
 		{
@@ -131,11 +128,6 @@ void net_manager::remove_from_polling_list(int socket)
 			return;
 		}
 	}
-}
-
-local_communicator_manager* net_manager::get_local_communicator()
-{
-	return &local_communicator_;
 }
 
 } // nemaspace Net

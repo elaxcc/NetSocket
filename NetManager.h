@@ -45,8 +45,6 @@ public:
 	 */
 	int process_sockets();
 
-	local_communicator_manager* get_local_communicator();
-
 private:
 	/*!
 	 * Start socket polling
@@ -62,7 +60,6 @@ private:
 private:
 	std::vector<i_net_member*> net_members_;
 	std::vector<pollfd> polling_list_;
-	local_communicator_manager local_communicator_;
 };
 
 } // name
