@@ -2,6 +2,7 @@
 #define LOCALCOMMUNICATION_H_
 
 #include <vector>
+#include <map>
 
 namespace Net
 {
@@ -106,7 +107,7 @@ private:
 private:
 	int current_added_member_id_;
 	std::vector<message_info> messages_;
-	std::vector<i_local_communicator*> members_;
+	std::map<int, i_local_communicator*> members_;
 };
 
 } // namespace Net

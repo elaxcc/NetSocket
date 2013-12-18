@@ -21,7 +21,8 @@ int local_communicator_manager::add_communicator(
 	{
 		current_added_member_id_++;
 		member->set_id(current_added_member_id_);
-		members_.push_back(member);
+		members_.insert(std::pair(current_added_member_id_,
+			member));
 
 		return current_added_member_id_;
 	}
@@ -33,19 +34,19 @@ int local_communicator_manager::add_message(
 	int source_id, int destination_id,
 	const std::vector<char> message)
 {
-	for (unsigned int i = 0; i < members_.size(); ++i)
+	std::map<int, i_local_communicator*>::iterator iter =
+		members_.find(destination_id);
+
+	if (iter != members_.end())
 	{
-		if (members_[i])
+		if (iter->second->get_id() == destination_id)
 		{
-			if (members_[i]->get_id() == destination_id)
-			{
-				messages_.push_back(
-					message_info(
-						source_id,
-						destination_id,
-						message));
-				return 0;
-			}
+			messages_.push_back(
+				message_info(
+					source_id,
+					destination_id,
+					message));
+			return 0;
 		}
 	}
 	return -1;
@@ -55,16 +56,13 @@ void local_communicator_manager::process()
 {
 	for (unsigned int i = 0; i < messages_.size(); ++i)
 	{
-		for (unsigned int j = 0; j < members_.size(); ++j)
+		std::map<int, i_local_communicator*>::iterator iter =
+			members_.find(messages_[i].destination_);
+
+		if (iter != members_.end())
 		{
-			if (members_[i])
-			{
-				if (messages_[i].destination_ == members_[j]->get_id())
-				{
-					members_[j]->process(messages_[i].source_,
-						messages_[i].message_);
-				}
-			}
+			iter->second->process(messages_[i].source_,
+				messages_[i].message_);
 		}
 	}
 
