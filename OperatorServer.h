@@ -6,27 +6,23 @@
 namespace Net
 {
 
-class net_manager;
-
-class operator_server : public i_net_member, private simple_server
+class operator_connection : public i_net_member
 {
 public:
-	operator_server(net_manager *net_manager, int port,
-		bool nonblocking, bool no_nagle_delay);
+	operator_connection(int socket);
 
 	// i_net_member
-	virtual ~operator_server();
+	virtual ~operator_connection();
 	virtual int process_events(short int polling_events);
 	virtual int get_socket();
 	virtual short int get_polling_flags();
 
 private:
-	class operator_connection;
-
-private:
-	net_manager *net_manager_;
+	int socket_;
 };
 
-} // Net
+typedef server<operator_connection> operator_server;
+
+} // namespace Net
 
 #endif /* OPERATORSERVER_H_ */

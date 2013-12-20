@@ -7,11 +7,10 @@
 
 int main(int argc, char** argv)
 {
-	/*
 	Net::net_manager net_manager;
 	Net::local_communicator_manager local_communicator_;
 
-	int hardware_client_socket = net_manager.add_member(
+	net_manager.add_member(
 		new Net::hardware_client(std::string("127.0.0.1"), 1234, true, true));
 
 	while (true)
@@ -20,8 +19,8 @@ int main(int argc, char** argv)
 		// process local messages
 		local_communicator_.process();
 	}
-	*/
 
+	/*
 	class A : public Net::i_local_communicator
 	{
 	public :
@@ -91,6 +90,7 @@ int main(int argc, char** argv)
 
 	local_comm_manager.destroy_link("AB");
 	std::cout << "link has been destroyed" << std::endl;
+	*/
 
 	return 0;
 }

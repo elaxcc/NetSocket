@@ -1,5 +1,7 @@
 #include "NetCommon.h"
 
+#include "NetManager.h"
+
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <unistd.h>

@@ -1,5 +1,7 @@
 #include "NetManager.h"
 
+#include "NetCommon.h"
+
 namespace Net
 {
 

@@ -1,6 +1,8 @@
 #ifndef NETCOMMON_H_
 #define NETCOMMON_H_
 
+#include "NetManager.h"
+
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -165,6 +167,57 @@ private:
 	bool no_nagle_delay_;
 };
 
+template<class connection>
+class server : public i_net_member, private simple_server
+{
+public:
+	server(net_manager *net_manager,
+		int port, bool nonblocking, bool no_nagle_delay)
+		: simple_server(nonblocking, no_nagle_delay)
+		, net_manager_(net_manager)
+	{
+		start_listen(port);
+	}
+
+	~server()
+	{
+		stop_listen();
+	}
+
+	int process_events(short int polling_events)
+	{
+		int accept_result = error_no_;
+		if (polling_events & POLLIN)
+		{
+			int new_client_socket;
+			struct sockaddr_in new_client_addr;
+
+			accept_result = client_accept(
+				&new_client_socket, &new_client_addr);
+
+			if (accept_result == error_no_)
+			{
+				net_manager_->add_member(
+					new connection(new_client_socket));
+			}
+		}
+		return accept_result;
+	}
+
+	int get_socket()
+	{
+		return simple_server::get_socket();
+	}
+
+	short int get_polling_flags()
+	{
+		return POLLIN;
+	}
+
+private:
+	net_manager *net_manager_;
+};
+
 /*!
  * Send data to socket
  * [in] socket - socket for sending
@@ -183,6 +236,6 @@ int send_data(int socket, char *data, int data_size);
  */
 int recv_data(int socket, char *buf, int buf_size, int *recv_data_size);
 
-}
+} // namespace Net
 
 #endif /* NETCOMMON_H_ */

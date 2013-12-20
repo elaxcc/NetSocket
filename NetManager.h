@@ -1,15 +1,15 @@
 #ifndef NETMANAGER_H_
 #define NETMANAGER_H_
 
-#include "NetCommon.h"
-#include "LocalCommunication.h"
-
 #include <vector>
 
 #include <poll.h>
 
 namespace Net
 {
+
+class i_net_member;
+
 /*!
  * Class for net members management
  */
@@ -62,6 +62,6 @@ private:
 	std::vector<pollfd> polling_list_;
 };
 
-} // name
+} // namespace Net
 
 #endif /* NETMANAGER_H_ */
