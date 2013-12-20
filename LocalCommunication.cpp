@@ -6,6 +6,7 @@ namespace Net
 i_local_communicator::i_local_communicator(
 	local_communicator_manager *manager)
 	: id_(0)
+	, links_cnt_(0)
 	, manager_(manager)
 {
 }
@@ -74,6 +75,9 @@ bool local_communicator_manager::create_link(
 	add_communicator(member_first);
 	add_communicator(member_second);
 
+	member_first->links_cnt_++;
+	member_second->links_cnt_++;
+
 	links_list_.insert(
 		std::pair<std::string, real_link>(
 			link, real_link(
@@ -81,6 +85,33 @@ bool local_communicator_manager::create_link(
 				member_second->get_id())));
 
 	return true;
+}
+
+void local_communicator_manager::destroy_link(
+	const std::string& link)
+{
+	std::map<std::string, real_link>::iterator link_iter =
+		links_list_.find(link);
+	if (link_iter != links_list_.end())
+	{
+		std::map<int, i_local_communicator*>::iterator first_iter =
+			members_.find(link_iter->second.first_);
+		first_iter->second->links_cnt_--;
+		if (first_iter->second->links_cnt_ == 0)
+		{
+			members_.erase(first_iter);
+		}
+
+		std::map<int, i_local_communicator*>::iterator second_iter =
+			members_.find(link_iter->second.second_);
+		second_iter->second->links_cnt_--;
+		if (second_iter->second->links_cnt_ == 0)
+		{
+			members_.erase(second_iter);
+		}
+
+		links_list_.erase(link_iter);
+	}
 }
 
 void local_communicator_manager::add_message(
@@ -106,6 +137,10 @@ void local_communicator_manager::process()
 	{
 		std::map<std::string, real_link>::iterator link_iter =
 			links_list_.find(messages_[i].link_);
+		if (link_iter == links_list_.end())
+		{
+			continue;
+		}
 
 		int destination_id = 0;
 		if (link_iter->second.first_ == messages_[i].source_id_)

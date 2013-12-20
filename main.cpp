@@ -82,10 +82,15 @@ int main(int argc, char** argv)
 		b_data, b_data + sizeof(b_data) / sizeof(char));
 	b.send_message("AB", b_vec);
 
-	while (true)
+	int i = 4;
+	while (i)
 	{
 		local_comm_manager.process();
+		i--;
 	}
+
+	local_comm_manager.destroy_link("AB");
+	std::cout << "link has been destroyed" << std::endl;
 
 	return 0;
 }

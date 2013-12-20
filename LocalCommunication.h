@@ -61,6 +61,7 @@ private:
 
 private:
 	int id_;
+	int links_cnt_;
 	local_communicator_manager* manager_;
 };
 
@@ -85,6 +86,12 @@ public:
 	bool create_link(const std::string& link,
 		i_local_communicator* member_first,
 		i_local_communicator* member_second);
+
+	/*!
+	 * Destroy link
+	 * [in] link - link name for destroying
+	 */
+	void destroy_link(const std::string& link);
 
 	/*!
 	 * Process all added messages
