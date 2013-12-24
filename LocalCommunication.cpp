@@ -67,7 +67,11 @@ bool local_communicator_manager::create_link(
 	i_local_communicator* member_first,
 	i_local_communicator* member_second)
 {
-	if (link.empty() || !member_first || !member_second)
+	std::map<std::string, real_link>::iterator link_iter =
+		links_list_.find(link);
+
+	if (link.empty() || !member_first || !member_second
+		|| link_iter != links_list_.end())
 	{
 		return false;
 	}
@@ -118,6 +122,13 @@ void local_communicator_manager::add_message(
 	const std::string& link, int source_id,
 	const std::vector<char>& message)
 {
+	std::map<std::string, real_link>::iterator link_iter =
+		links_list_.find(link);
+	if (link_iter == links_list_.end())
+	{
+		return;
+	}
+
 	messages_.push_back(
 		message_info(
 			link,
