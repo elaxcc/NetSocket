@@ -3,15 +3,29 @@
 
 #include "NetManager.h"
 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <poll.h>
+
+#if defined LINUX
+	#include <sys/types.h>
+	#include <sys/socket.h>
+	#include <netinet/in.h>
+	#include <poll.h>
+#elif defined WIN || WIN32 || WIN64
+	#include <windows.h>
+
+	#pragma comment(lib, "ws2_32.lib")
+#endif
+
 
 #include "string"
 
 namespace Net
 {
+
+#if defined WIN || WIN32 || WIN64
+
+bool init();
+
+#endif
 
 /*!
  * List of net errors

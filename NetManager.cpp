@@ -105,8 +105,15 @@ int net_manager::poll_sockets(int timeout)
 		polling_list_[i].revents = 0;
 	}
 
-	int result = poll(polling_list_.data(),
+	int result;
+#ifdef LINUX
+	result = poll(polling_list_.data(),
 		polling_list_.size(), timeout);
+#elif defined WIN || WIN32 || WIN64
+	result = WSAPoll(&(*polling_list_.begin()),
+		polling_list_.size(), timeout);
+#endif
+	
 
 	if (result == 0)
 	{

@@ -2,14 +2,18 @@
 
 #include "NetManager.h"
 
-#include <unistd.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <netinet/tcp.h>
-#include <poll.h>
-#include <errno.h>
-#include <string.h>
+#if defined LINUX
+	#include <unistd.h>
+	#include <arpa/inet.h>
+	#include <unistd.h>
+	#include <fcntl.h>
+	#include <netinet/tcp.h>
+	#include <poll.h>
+	#include <errno.h>
+	#include <string.h>
+#elif defined WIN || WIN32 || WIN64
+	#include <windows.h>
+#endif
 
 namespace Net
 {
@@ -36,35 +40,57 @@ simple_client::~simple_client()
 {
 	if (socket_ > 0)
 	{
+#if defined LINUX
 		shutdown(socket_, SHUT_RDWR);
 		close(socket_);
+#elif defined WIN || WIN32 || WIN64
+		closesocket(socket_);
+#endif
 	}
 }
 
 int simple_client::connect_to(const std::string& address, int port)
 {
+
 	address_.sin_family = AF_INET;
 	address_.sin_port = htons(port);
 	address_.sin_addr.s_addr = inet_addr(address.c_str());
 
+
 	// отключить алгоритм нагла
 
 	socket_ = socket(AF_INET, SOCK_STREAM, 0);
+#if defined LINUX
 	if (socket_ < 0)
+#elif defined WIN || WIN32 || WIN64
+	if (socket_ == INVALID_SOCKET)
+#endif
 	{
 		return error_create_socket_;
 	}
 
+
 	if (no_nagle_delay_)
 	{
+#if defined LINUX
 		int set_opt_val = 1;
+#elif defined WIN || WIN32 || WIN64
+		char set_opt_val = 1;
+#endif
+
+#if defined LINUX
 		if (setsockopt(socket_, SOL_TCP, TCP_NODELAY,
-				&set_opt_val, sizeof(set_opt_val)) < 0)
+			&set_opt_val, sizeof(set_opt_val)) < 0)
+#elif defined WIN || WIN32 || WIN64
+		if (setsockopt(socket_, IPPROTO_TCP, TCP_NODELAY,
+			&set_opt_val, sizeof(set_opt_val)) != 0)
+#endif
 		{
 			return error_set_opt_nodelay_;
 		}
 	}
 
+#if defined LINUX
 	if (nonblocking_)
 	{
 		if (fcntl(socket_, F_SETFL, O_NONBLOCK) < 0)
@@ -72,10 +98,24 @@ int simple_client::connect_to(const std::string& address, int port)
 			return error_create_nonblock_socket_;
 		}
 	}
+#elif defined WIN || WIN32 || WIN64
+	if (nonblocking_)
+	{
+		u_long iMode = 1;
+		if (ioctlsocket(socket_, FIONBIO, &iMode) != 0)
+		{
+			return error_create_nonblock_socket_;
+		}
+	}
+#endif
 
 	int connect_result = connect(socket_, (struct sockaddr *) &address_,
 			sizeof(struct sockaddr));
+#if defined LINUX
 	if (nonblocking_ && connect_result == -1 && errno != EINPROGRESS)
+#elif defined WIN || WIN32 || WIN64
+	if (connect_result != 0)
+#endif
 	{
 		return error_connect_;
 	}
@@ -84,11 +124,22 @@ int simple_client::connect_to(const std::string& address, int port)
 
 int simple_client::close_connection()
 {
-	int result = shutdown(socket_, SHUT_RDWR);
+	int result;
+
+#if defined LINUX
+	result = shutdown(socket_, SHUT_RDWR);
 	close(socket_);
+#elif defined WIN || WIN32 || WIN64
+	result = closesocket(socket_);
+#endif
+
 	socket_ = -1;
 
+#if defined LINUX
 	if (result < 0)
+#elif defined WIN || WIN32 || WIN64
+	if (result != 0)
+#endif
 	{
 		return error_shutdown_;
 	}
@@ -115,39 +166,65 @@ simple_server::~simple_server()
 {
 	if (socket_ > 0)
 	{
+#if defined LINUX
 		shutdown(socket_, SHUT_RDWR);
 		close(socket_);
+#elif defined WIN || WIN32 || WIN64
+		closesocket(socket_);
+#endif
 	}
 }
 
 int simple_server::start_listen(int port)
 {
+
 	address_.sin_family = AF_INET;
 	address_.sin_port = htons(port);
 	address_.sin_addr.s_addr = htonl(INADDR_ANY);
 
 	socket_ = socket(AF_INET, SOCK_STREAM, 0);
+#if defined LINUX
 	if (socket_ < 0)
+#elif defined WIN || WIN32 || WIN64
+	if (socket_ == INVALID_SOCKET)
+#endif
 	{
 		return error_create_socket_;
 	}
 
+#if defined LINUX
 	int set_opt_val = 1;
+#elif defined WIN || WIN32 || WIN64
+	char set_opt_val = 1;
+#endif
+
+#if defined LINUX
 	if (setsockopt(socket_, SOL_SOCKET, SO_REUSEADDR,
 			&set_opt_val, sizeof(set_opt_val)) < 0)
+#elif defined WIN || WIN32 || WIN64
+	if (setsockopt(socket_, SOL_SOCKET, SO_REUSEADDR,
+		&set_opt_val, sizeof(set_opt_val)) != 0)
+#endif
 	{
 		return error_set_opt_reuse_addr_;
 	}
+
 	if (no_nagle_delay_)
 	{
 		set_opt_val = 1;
+#if defined LINUX
 		if (setsockopt(socket_, SOL_TCP, TCP_NODELAY,
-				&set_opt_val, sizeof(set_opt_val)) < 0)
+			&set_opt_val, sizeof(set_opt_val)) < 0)
+#elif defined WIN || WIN32 || WIN64
+		if (setsockopt(socket_, IPPROTO_TCP, TCP_NODELAY,
+			&set_opt_val, sizeof(set_opt_val)) != 0)
+#endif
 		{
 			return error_set_opt_nodelay_;
 		}
 	}
 
+#if defined LINUX
 	if (nonblocking_)
 	{
 		if (fcntl(socket_, F_SETFL, O_NONBLOCK) < 0)
@@ -155,14 +232,33 @@ int simple_server::start_listen(int port)
 			return error_create_nonblock_socket_;
 		}
 	}
+#elif defined WIN || WIN32 || WIN64
+	if (nonblocking_)
+	{
+		u_long iMode = 1;
+		if (ioctlsocket(socket_, FIONBIO, &iMode) != 0)
+		{
+			return error_create_nonblock_socket_;
+		}
+	}
+#endif
 
+#if defined LINUX
 	if (bind(socket_, (struct sockaddr*) &address_,
 			sizeof(struct sockaddr)) < 0)
+#elif defined WIN || WIN32 || WIN64
+	if (bind(socket_, (struct sockaddr*) &address_,
+		sizeof(struct sockaddr)) != 0)
+#endif
 	{
 		return error_binding_;
 	}
 
+#if defined LINUX
 	if (listen(socket_, c_client_queue_size) < 0)
+#elif defined WIN || WIN32 || WIN64
+	if (listen(socket_, c_client_queue_size) != 0)
+#endif
 	{
 		return error_start_listen_;
 	}
@@ -172,11 +268,22 @@ int simple_server::start_listen(int port)
 
 int simple_server::stop_listen()
 {
-	int result = shutdown(socket_, SHUT_RDWR);
+	int result;
+
+#if defined LINUX
+	result = shutdown(socket_, SHUT_RDWR);
 	close(socket_);
+#elif defined WIN || WIN32 || WIN64
+	result = closesocket(socket_);
+#endif
+
 	socket_ = -1;
 
+#if defined LINUX
 	if (result < 0)
+#elif defined WIN || WIN32 || WIN64
+	if (result != 0)
+#endif
 	{
 		return error_shutdown_;
 	}
@@ -186,11 +293,15 @@ int simple_server::stop_listen()
 int simple_server::client_accept(int *client_socket,
 	struct sockaddr_in *client_addr) const
 {
-	socklen_t addr_size = sizeof(struct sockaddr);
+	int addr_size = sizeof(struct sockaddr);
 	*client_socket = accept(socket_, (struct sockaddr*) client_addr,
 			&addr_size);
 
+#if defined LINUX
 	if (*client_socket < 0)
+#elif defined WIN || WIN32 || WIN64
+	if (*client_socket == INVALID_SOCKET)
+#endif
 	{
 		return error_client_accept_;
 	}
@@ -211,21 +322,28 @@ int send_data(int socket, char *data, int data_size)
 	int sended_bytes;
 		int total_bytes = data_size;
 
-		while(total_bytes)
+	while(total_bytes)
+	{
+#if defined LINUX
+		sended_bytes = send(
+				socket,
+				&(data[data_size - total_bytes]),
+				total_bytes, MSG_NOSIGNAL);
+#elif defined WIN || WIN32 || WIN64
+		sended_bytes = send(
+			socket,
+			&(data[data_size - total_bytes]),
+			total_bytes, 0);
+#endif
+
+		if (sended_bytes < 0)
 		{
-			sended_bytes = send(
-					socket,
-					&(data[data_size - total_bytes]),
-					total_bytes, MSG_NOSIGNAL);
-
-			if (sended_bytes < 0)
-			{
-				return error_send_;
-			}
-
-			total_bytes -= sended_bytes;
+			return error_send_;
 		}
-		return error_no_;
+
+		total_bytes -= sended_bytes;
+	}
+	return error_no_;
 }
 
 int recv_data(int socket, char *buf, int buf_size, int *recv_data_size)
@@ -243,5 +361,13 @@ int recv_data(int socket, char *buf, int buf_size, int *recv_data_size)
 	}
 	return error_no_;
 }
+
+#if defined WIN || WIN32 || WIN64
+WSADATA wsadata_;
+bool init()
+{
+	return WSAStartup(MAKEWORD(2, 0), &wsadata_) == 0;
+}
+#endif
 
 } // Net

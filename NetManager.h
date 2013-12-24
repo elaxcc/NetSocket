@@ -3,7 +3,12 @@
 
 #include <vector>
 
-#include <poll.h>
+#ifdef LINUX
+	#include <poll.h>
+#elif defined WIN || WIN32 || WIN64
+	#include <WinSock2.h>
+	#include <windows.h>
+#endif
 
 namespace Net
 {
@@ -59,7 +64,12 @@ private:
 
 private:
 	std::vector<i_net_member*> net_members_;
+
+#ifdef LINUX
 	std::vector<pollfd> polling_list_;
+#elif defined WIN || WIN32 || WIN64
+	std::vector<WSAPOLLFD> polling_list_;
+#endif
 };
 
 } // namespace Net
