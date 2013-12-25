@@ -293,7 +293,11 @@ int simple_server::stop_listen()
 int simple_server::client_accept(int *client_socket,
 	struct sockaddr_in *client_addr) const
 {
+#if defined LINUX || UNIX || linux || unix || __linux || __linux__ || __unix || __unix__ || __gnu_linux__
 	unsigned int addr_size = sizeof(struct sockaddr);
+#elif defined WIN || WIN32 || WIN64
+	int addr_size = sizeof(struct sockaddr);
+#endif
 	*client_socket = accept(socket_, (struct sockaddr*) client_addr,
 			&addr_size);
 

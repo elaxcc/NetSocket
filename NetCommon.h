@@ -23,6 +23,9 @@ namespace Net
 
 #if defined WIN || WIN32 || WIN64
 
+/*!
+ * Initialize Windows socket library (Windows only)
+ */
 bool init();
 
 #endif
@@ -52,6 +55,14 @@ enum error
 	error_can_not_find_server_ = -17,
 	error_server_pollin_no_connect_co_data_ = -18
 };
+
+#if defined LINUX || UNIX || linux || unix || __linux || __linux__ || __unix || __unix__ || __gnu_linux__
+static const short int c_poll_event_in = POLLIN;
+static const short int c_poll_event_out = POLLOUT;
+#elif defined WIN || WIN32 || WIN64
+static const short int c_poll_event_in = POLLRDNORM;
+static const short int c_poll_event_out = POLLWRNORM;
+#endif
 
 /*!
  * common net member interface
@@ -128,6 +139,46 @@ private:
 };
 
 /*!
+ * Abstract class for client realization
+ */
+class client : public i_net_member, private simple_client
+{
+public:
+	client(short int initial_polling_flags_,
+		bool nonblocking, bool no_nagle_delay)
+		: simple_client(nonblocking, no_nagle_delay)
+		, polling_flags_(initial_polling_flags_)
+	{
+	}
+
+	~client()
+	{
+		simple_client::close_connection();
+	}
+
+	int connect_to(std::string address, int port)
+	{
+		return simple_client::connect_to(address, port);
+	}
+
+public: // i_net_member
+	virtual int process_events(short int polling_events) = 0;
+
+	virtual int get_socket()
+	{
+		return simple_client::get_socket();
+	}
+
+	virtual short int get_polling_flags()
+	{
+		return polling_flags_;
+	}
+
+private:
+	short int polling_flags_;
+};
+
+/*!
  * Class for server realization
  */
 class simple_server
@@ -181,14 +232,19 @@ private:
 	bool no_nagle_delay_;
 };
 
+/*!
+ * Template class for server realization
+ */
 template<class connection>
 class server : public i_net_member, private simple_server
 {
 public:
 	server(net_manager *net_manager,
-		int port, bool nonblocking, bool no_nagle_delay)
+		int port, short int connection_initial_polling_flags,
+		bool nonblocking, bool no_nagle_delay)
 		: simple_server(nonblocking, no_nagle_delay)
 		, net_manager_(net_manager)
+		, connection_initial_polling_flags_(connection_initial_polling_flags)
 	{
 		start_listen(port);
 	}
@@ -198,10 +254,11 @@ public:
 		stop_listen();
 	}
 
-	int process_events(short int polling_events)
+public: // i_net_member
+	virtual int process_events(short int polling_events)
 	{
 		int accept_result = error_no_;
-		if (polling_events & POLLIN)
+		if (polling_events & c_poll_event_in)
 		{
 			int new_client_socket;
 			struct sockaddr_in new_client_addr;
@@ -212,24 +269,66 @@ public:
 			if (accept_result == error_no_)
 			{
 				net_manager_->add_member(
-					new connection(new_client_socket));
+					new connection(new_client_socket, 
+						connection_initial_polling_flags_));
 			}
 		}
 		return accept_result;
 	}
 
-	int get_socket()
+	virtual int get_socket()
 	{
 		return simple_server::get_socket();
 	}
 
-	short int get_polling_flags()
+	virtual short int get_polling_flags()
 	{
-		return POLLIN;
+		return c_poll_event_in;
 	}
 
 private:
 	net_manager *net_manager_;
+	short int connection_initial_polling_flags_;
+};
+
+/*!
+ * Abstract server connection
+ */
+class connection : public i_net_member
+{
+public:
+	connection(int socket, short int initial_polling_flags)
+		: socket_(socket)
+		, polling_flags_(initial_polling_flags)
+	{
+	}
+
+	~connection()
+	{
+#if defined LINUX || UNIX || linux || unix || __linux || __linux__ || __unix || __unix__ || __gnu_linux__
+		shutdown(socket_, SHUT_RDWR);
+		close(socket_);
+#elif defined WIN || WIN32 || WIN64
+		closesocket(socket_);
+#endif
+	}
+
+public: // i_net_member
+	virtual int process_events(short int polling_events) = 0;
+
+	virtual int get_socket()
+	{
+		return socket_;
+	}
+
+	virtual short int get_polling_flags()
+	{
+		return polling_flags_;
+	}
+
+private:
+	int socket_;
+	short int polling_flags_;
 };
 
 /*!
