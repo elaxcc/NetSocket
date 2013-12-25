@@ -4,7 +4,7 @@
 #include "NetManager.h"
 
 
-#if defined LINUX
+#if defined LINUX || UNIX || linux || unix || __linux || __linux__ || __unix || __unix__ || __gnu_linux__
 	#include <sys/types.h>
 	#include <sys/socket.h>
 	#include <netinet/in.h>

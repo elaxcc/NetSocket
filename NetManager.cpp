@@ -106,7 +106,7 @@ int net_manager::poll_sockets(int timeout)
 	}
 
 	int result;
-#ifdef LINUX
+#if defined LINUX || UNIX || linux || unix || __linux || __linux__ || __unix || __unix__ || __gnu_linux__
 	result = poll(polling_list_.data(),
 		polling_list_.size(), timeout);
 #elif defined WIN || WIN32 || WIN64

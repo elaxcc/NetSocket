@@ -2,7 +2,7 @@
 
 #include "NetManager.h"
 
-#if defined LINUX
+#if defined LINUX || UNIX || linux || unix || __linux || __linux__ || __unix || __unix__ || __gnu_linux__
 	#include <unistd.h>
 	#include <arpa/inet.h>
 	#include <unistd.h>
@@ -40,7 +40,7 @@ simple_client::~simple_client()
 {
 	if (socket_ > 0)
 	{
-#if defined LINUX
+#if defined LINUX || UNIX || linux || unix || __linux || __linux__ || __unix || __unix__ || __gnu_linux__
 		shutdown(socket_, SHUT_RDWR);
 		close(socket_);
 #elif defined WIN || WIN32 || WIN64
@@ -60,7 +60,7 @@ int simple_client::connect_to(const std::string& address, int port)
 	// отключить алгоритм нагла
 
 	socket_ = socket(AF_INET, SOCK_STREAM, 0);
-#if defined LINUX
+#if defined LINUX || UNIX || linux || unix || __linux || __linux__ || __unix || __unix__ || __gnu_linux__
 	if (socket_ < 0)
 #elif defined WIN || WIN32 || WIN64
 	if (socket_ == INVALID_SOCKET)
@@ -72,13 +72,13 @@ int simple_client::connect_to(const std::string& address, int port)
 
 	if (no_nagle_delay_)
 	{
-#if defined LINUX
+#if defined LINUX || UNIX || linux || unix || __linux || __linux__ || __unix || __unix__ || __gnu_linux__
 		int set_opt_val = 1;
 #elif defined WIN || WIN32 || WIN64
 		char set_opt_val = 1;
 #endif
 
-#if defined LINUX
+#if defined LINUX || UNIX || linux || unix || __linux || __linux__ || __unix || __unix__ || __gnu_linux__
 		if (setsockopt(socket_, SOL_TCP, TCP_NODELAY,
 			&set_opt_val, sizeof(set_opt_val)) < 0)
 #elif defined WIN || WIN32 || WIN64
@@ -90,7 +90,7 @@ int simple_client::connect_to(const std::string& address, int port)
 		}
 	}
 
-#if defined LINUX
+#if defined LINUX || UNIX || linux || unix || __linux || __linux__ || __unix || __unix__ || __gnu_linux__
 	if (nonblocking_)
 	{
 		if (fcntl(socket_, F_SETFL, O_NONBLOCK) < 0)
@@ -111,7 +111,7 @@ int simple_client::connect_to(const std::string& address, int port)
 
 	int connect_result = connect(socket_, (struct sockaddr *) &address_,
 			sizeof(struct sockaddr));
-#if defined LINUX
+#if defined LINUX || UNIX || linux || unix || __linux || __linux__ || __unix || __unix__ || __gnu_linux__
 	if (nonblocking_ && connect_result == -1 && errno != EINPROGRESS)
 #elif defined WIN || WIN32 || WIN64
 	if (connect_result != 0)
@@ -126,7 +126,7 @@ int simple_client::close_connection()
 {
 	int result;
 
-#if defined LINUX
+#if defined LINUX || UNIX || linux || unix || __linux || __linux__ || __unix || __unix__ || __gnu_linux__
 	result = shutdown(socket_, SHUT_RDWR);
 	close(socket_);
 #elif defined WIN || WIN32 || WIN64
@@ -135,7 +135,7 @@ int simple_client::close_connection()
 
 	socket_ = -1;
 
-#if defined LINUX
+#if defined LINUX || UNIX || linux || unix || __linux || __linux__ || __unix || __unix__ || __gnu_linux__
 	if (result < 0)
 #elif defined WIN || WIN32 || WIN64
 	if (result != 0)
@@ -166,7 +166,7 @@ simple_server::~simple_server()
 {
 	if (socket_ > 0)
 	{
-#if defined LINUX
+#if defined LINUX || UNIX || linux || unix || __linux || __linux__ || __unix || __unix__ || __gnu_linux__
 		shutdown(socket_, SHUT_RDWR);
 		close(socket_);
 #elif defined WIN || WIN32 || WIN64
@@ -183,7 +183,7 @@ int simple_server::start_listen(int port)
 	address_.sin_addr.s_addr = htonl(INADDR_ANY);
 
 	socket_ = socket(AF_INET, SOCK_STREAM, 0);
-#if defined LINUX
+#if defined LINUX || UNIX || linux || unix || __linux || __linux__ || __unix || __unix__ || __gnu_linux__
 	if (socket_ < 0)
 #elif defined WIN || WIN32 || WIN64
 	if (socket_ == INVALID_SOCKET)
@@ -192,13 +192,13 @@ int simple_server::start_listen(int port)
 		return error_create_socket_;
 	}
 
-#if defined LINUX
+#if defined LINUX || UNIX || linux || unix || __linux || __linux__ || __unix || __unix__ || __gnu_linux__
 	int set_opt_val = 1;
 #elif defined WIN || WIN32 || WIN64
 	char set_opt_val = 1;
 #endif
 
-#if defined LINUX
+#if defined LINUX || UNIX || linux || unix || __linux || __linux__ || __unix || __unix__ || __gnu_linux__
 	if (setsockopt(socket_, SOL_SOCKET, SO_REUSEADDR,
 			&set_opt_val, sizeof(set_opt_val)) < 0)
 #elif defined WIN || WIN32 || WIN64
@@ -212,7 +212,7 @@ int simple_server::start_listen(int port)
 	if (no_nagle_delay_)
 	{
 		set_opt_val = 1;
-#if defined LINUX
+#if defined LINUX || UNIX || linux || unix || __linux || __linux__ || __unix || __unix__ || __gnu_linux__
 		if (setsockopt(socket_, SOL_TCP, TCP_NODELAY,
 			&set_opt_val, sizeof(set_opt_val)) < 0)
 #elif defined WIN || WIN32 || WIN64
@@ -224,7 +224,7 @@ int simple_server::start_listen(int port)
 		}
 	}
 
-#if defined LINUX
+#if defined LINUX || UNIX || linux || unix || __linux || __linux__ || __unix || __unix__ || __gnu_linux__
 	if (nonblocking_)
 	{
 		if (fcntl(socket_, F_SETFL, O_NONBLOCK) < 0)
@@ -243,7 +243,7 @@ int simple_server::start_listen(int port)
 	}
 #endif
 
-#if defined LINUX
+#if defined LINUX || UNIX || linux || unix || __linux || __linux__ || __unix || __unix__ || __gnu_linux__
 	if (bind(socket_, (struct sockaddr*) &address_,
 			sizeof(struct sockaddr)) < 0)
 #elif defined WIN || WIN32 || WIN64
@@ -254,7 +254,7 @@ int simple_server::start_listen(int port)
 		return error_binding_;
 	}
 
-#if defined LINUX
+#if defined LINUX || UNIX || linux || unix || __linux || __linux__ || __unix || __unix__ || __gnu_linux__
 	if (listen(socket_, c_client_queue_size) < 0)
 #elif defined WIN || WIN32 || WIN64
 	if (listen(socket_, c_client_queue_size) != 0)
@@ -270,7 +270,7 @@ int simple_server::stop_listen()
 {
 	int result;
 
-#if defined LINUX
+#if defined LINUX || UNIX || linux || unix || __linux || __linux__ || __unix || __unix__ || __gnu_linux__
 	result = shutdown(socket_, SHUT_RDWR);
 	close(socket_);
 #elif defined WIN || WIN32 || WIN64
@@ -279,7 +279,7 @@ int simple_server::stop_listen()
 
 	socket_ = -1;
 
-#if defined LINUX
+#if defined LINUX || UNIX || linux || unix || __linux || __linux__ || __unix || __unix__ || __gnu_linux__
 	if (result < 0)
 #elif defined WIN || WIN32 || WIN64
 	if (result != 0)
@@ -293,11 +293,11 @@ int simple_server::stop_listen()
 int simple_server::client_accept(int *client_socket,
 	struct sockaddr_in *client_addr) const
 {
-	int addr_size = sizeof(struct sockaddr);
+	unsigned int addr_size = sizeof(struct sockaddr);
 	*client_socket = accept(socket_, (struct sockaddr*) client_addr,
 			&addr_size);
 
-#if defined LINUX
+#if defined LINUX || UNIX || linux || unix || __linux || __linux__ || __unix || __unix__ || __gnu_linux__
 	if (*client_socket < 0)
 #elif defined WIN || WIN32 || WIN64
 	if (*client_socket == INVALID_SOCKET)
@@ -324,7 +324,7 @@ int send_data(int socket, char *data, int data_size)
 
 	while(total_bytes)
 	{
-#if defined LINUX
+#if defined LINUX || UNIX || linux || unix || __linux || __linux__ || __unix || __unix__ || __gnu_linux__
 		sended_bytes = send(
 				socket,
 				&(data[data_size - total_bytes]),

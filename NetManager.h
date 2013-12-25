@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#ifdef LINUX
+#if defined LINUX || UNIX || linux || unix || __linux || __linux__ || __unix || __unix__ || __gnu_linux__
 	#include <poll.h>
 #elif defined WIN || WIN32 || WIN64
 	#include <WinSock2.h>
@@ -65,7 +65,7 @@ private:
 private:
 	std::vector<i_net_member*> net_members_;
 
-#ifdef LINUX
+#if defined LINUX || UNIX || linux || unix || __linux || __linux__ || __unix || __unix__ || __gnu_linux__
 	std::vector<pollfd> polling_list_;
 #elif defined WIN || WIN32 || WIN64
 	std::vector<WSAPOLLFD> polling_list_;
