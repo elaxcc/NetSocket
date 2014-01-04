@@ -265,7 +265,11 @@ public: // i_net_member
 
 			if (accept_result == error_no_)
 			{
-				net_manager_->add_member(create_connection(new_client_socket));
+				i_net_member *new_connection = create_connection(new_client_socket);
+				if (new_connection)
+				{
+					net_manager_->add_member(new_connection);
+				}
 			}
 		}
 		return accept_result;
