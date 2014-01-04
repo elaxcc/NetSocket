@@ -1,6 +1,13 @@
+#include "stdafx.h"
+
 #include "Timer.h"
 
+
+#if defined LINUX || UNIX || linux || unix || __linux || __linux__ || __unix || __unix__ || __gnu_linux__
+#include <unistd.h>
+#elif defined WIN || WIN32 || WIN64
 #include <Windows.h>
+#endif
 
 namespace Net
 {
@@ -56,8 +63,11 @@ void timer::process()
 {
 	while (!thread_->need_stop())
 	{
-		//!fixme
+#if defined LINUX || UNIX || linux || unix || __linux || __linux__ || __unix || __unix__ || __gnu_linux__
+		usleep(ms_delay_)
+#elif defined WIN || WIN32 || WIN64
 		Sleep(ms_delay_);
+#endif
 
 		boost::unique_lock<boost::shared_mutex> locker(mutex_);
 
