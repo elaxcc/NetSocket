@@ -32,7 +32,7 @@ public:
 	~net_manager();
 
 	/*!
-	 * Add new net member in mamagement list
+	 * Add new net member in management list
 	 * [in] member - adding member pointer
 	 * retval - socket of added member
 	 */
@@ -46,9 +46,15 @@ public:
 
 	/*!
 	 * Process net members after polling
-	 * retval error code
+	 * retval - error code
 	 */
 	int process_sockets();
+
+	/*!
+	 * Get amount of members
+	 * retval - amounts of members
+	 */
+	int members_cnt();
 
 private:
 	/*!

@@ -233,18 +233,15 @@ private:
 };
 
 /*!
- * Template class for server realization
+ * Class for server realization
  */
-template<class connection>
 class server : public i_net_member, private simple_server
 {
 public:
 	server(net_manager *net_manager,
-		int port, short int connection_initial_polling_flags,
-		bool nonblocking, bool no_nagle_delay)
+		int port, bool nonblocking, bool no_nagle_delay)
 		: simple_server(nonblocking, no_nagle_delay)
 		, net_manager_(net_manager)
-		, connection_initial_polling_flags_(connection_initial_polling_flags)
 	{
 		start_listen(port);
 	}
@@ -268,9 +265,7 @@ public: // i_net_member
 
 			if (accept_result == error_no_)
 			{
-				net_manager_->add_member(
-					new connection(new_client_socket, 
-						connection_initial_polling_flags_));
+				net_manager_->add_member(create_connection(new_client_socket));
 			}
 		}
 		return accept_result;
@@ -286,9 +281,16 @@ public: // i_net_member
 		return c_poll_event_in;
 	}
 
+public:
+	/*!
+	 * Create new connection member and return pointer to it
+	 * [in] socket - socket of new the connection
+	 * retval - pointer to new connection member
+	 */
+	virtual i_net_member* create_connection(int socket) = 0;
+
 private:
 	net_manager *net_manager_;
-	short int connection_initial_polling_flags_;
 };
 
 /*!

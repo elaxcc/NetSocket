@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "NetManager.h"
 
 #include "NetCommon.h"
@@ -95,6 +97,11 @@ int net_manager::process_sockets()
 	}
 
 	return poll_result;
+}
+
+int net_manager::members_cnt()
+{
+	return net_members_.size();
 }
 
 int net_manager::poll_sockets(int timeout)
