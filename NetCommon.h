@@ -174,6 +174,11 @@ public: // i_net_member
 		return polling_flags_;
 	}
 
+	void set_polling_flags(short int polling_flags)
+	{
+		polling_flags_ = polling_flags;
+	}
+
 private:
 	short int polling_flags_;
 };
@@ -335,6 +340,11 @@ public: // i_net_member
 	virtual short int get_polling_flags()
 	{
 		return polling_flags_;
+	}
+
+	void set_polling_flags(short int polling_flags)
+	{
+		polling_flags_ = polling_flags;
 	}
 
 private:
