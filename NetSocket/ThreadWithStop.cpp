@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "ThreadWithStop.h"
 
 ThreadWithStop::ThreadWithStop(const Callback& callback)
