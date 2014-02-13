@@ -370,6 +370,14 @@ int send_data(int socket, char *data, int data_size);
  */
 int recv_data(int socket, char *buf, int buf_size, int *recv_data_size);
 
+/*!
+ * Receive all data from socket
+ * [in] socket - socket for receiving
+ * [out] data - buffer for storing data
+ * retval - error code
+ */
+int recv_all(int socket, std::vector<char>& data);
+
 } // namespace Net
 
 #endif /* NETCOMMON_H_ */

@@ -368,6 +368,31 @@ int recv_data(int socket, char *buf, int buf_size, int *recv_data_size)
 	return error_no_;
 }
 
+int recv_all(int socket, std::vector<char>& data)
+{
+	int recv_result = Net::error_no_;
+	while (recv_result == Net::error_no_)
+	{
+		char login_data_buffer[4096];
+		int incoming_data_size = 0;
+
+		recv_result = Net::recv_data(socket, login_data_buffer,
+			sizeof(login_data_buffer), &incoming_data_size);
+
+		if (incoming_data_size > 0)
+		{
+			data.insert(data.end(), login_data_buffer,
+				login_data_buffer + incoming_data_size);
+		}
+	}
+
+	if (recv_result == Net::error_connection_is_closed_)
+	{
+		return recv_result;
+	}
+	return Net::error_no_;
+}
+
 #if defined WIN || WIN32 || WIN64
 WSADATA wsadata_;
 bool init()
