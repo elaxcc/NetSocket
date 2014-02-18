@@ -58,7 +58,6 @@ int simple_client::connect_to(const std::string& address, int port)
 	address_.sin_port = htons(port);
 	address_.sin_addr.s_addr = inet_addr(address.c_str());
 
-
 	// отключить алгоритм нагла
 
 	socket_ = socket(AF_INET, SOCK_STREAM, 0);
@@ -119,6 +118,12 @@ int simple_client::connect_to(const std::string& address, int port)
 	if (connect_result != 0)
 #endif
 	{
+#if defined WIN || WIN32 || WIN64
+		if (WSAEWOULDBLOCK == WSAGetLastError())
+		{
+			return error_no_;
+		}
+#endif
 		return error_connect_;
 	}
 	return error_no_;
